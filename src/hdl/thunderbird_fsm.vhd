@@ -120,9 +120,9 @@ begin
 	o_lights_L(2) <= f_q(6) or f_q(0);
     o_lights_L(1) <= f_q(6) or f_q(1) or f_q(0);
     o_lights_L(0) <= f_q(6) or f_q(2) or f_q(1) or f_q(0);
-    o_lights_R(2) <= f_q(6) or f_q(5) or f_q(4) or f_q(3);
+    o_lights_R(0) <= f_q(6) or f_q(5) or f_q(4) or f_q(3);
     o_lights_R(1) <= f_q(6) or f_q(4) or f_q(3);
-    o_lights_R(0) <= f_q(6) or f_q(3);
+    o_lights_R(2) <= f_q(6) or f_q(3);
 	
 	-- PROCESSES --------------------------------------------------------------------
     register_proc : process (i_clk, i_reset)
