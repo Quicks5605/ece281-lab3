@@ -133,10 +133,10 @@ begin
               assert w_lights_R = "000" report "should be off when no right" severity failure;
             wait for k_clk_period;-- right on
               assert w_lights_L = "000" report "should be off when right is going" severity failure;
-              assert w_lights_R = "100" report "should start going on" severity failure;
+              assert w_lights_R = "001" report "should start going on" severity failure;
             w_L <= '1'; w_R <= '0'; wait for k_clk_period; --right going, switch inputs
               assert w_lights_L = "000" report "should be off when right is going" severity failure;
-              assert w_lights_R = "110" report "should be 2nd step" severity failure;
+              assert w_lights_R = "011" report "should be 2nd step" severity failure;
             wait for k_clk_period;--wait
               assert w_lights_L = "000" report "should be off when right is going" severity failure;
               assert w_lights_R = "111" report "should be third step" severity failure;
