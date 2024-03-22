@@ -36,18 +36,18 @@
 --|					can be changed by the inputs
 --|					
 --|
---|                 xxx State Encoding key
+--|                 One-Hot State Encoding key
 --|                 --------------------
 --|                  State | Encoding
 --|                 --------------------
---|                  OFF   | 
---|                  ON    | 
---|                  R1    | 
---|                  R2    | 
---|                  R3    | 
---|                  L1    | 
---|                  L2    | 
---|                  L3    | 
+--|                  OFF   | 10000000
+--|                  ON    | 01000000
+--|                  R1    | 00100000
+--|                  R2    | 00010000
+--|                  R3    | 00001000
+--|                  L1    | 00000100
+--|                  L2    | 00000010
+--|                  L3    | 00000001
 --|                 --------------------
 --|
 --|
@@ -85,24 +85,54 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
  
-entity thunderbird_fsm is 
-  port(
-	
-  );
-end thunderbird_fsm;
+entity thunderbird_fsm is
+      port (
+          i_clk, i_reset  : in    std_logic;
+          i_left, i_right : in    std_logic;
+          o_lights_L      : out   std_logic_vector(2 downto 0);
+          o_lights_R      : out   std_logic_vector(2 downto 0)
+      );
+  end thunderbird_fsm;
 
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
 -- CONSTANTS ------------------------------------------------------------------
-  
+    signal f_q : Std_Logic_Vector (7 downto 0) := "00000000";
+    signal f_q_next : Std_Logic_Vector (7 downto 0) := "00000000";
+    
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
-	
+	-- Next state logic
+    f_q_next(7) <= (f_q(7) and not i_left and not i_right) or f_q(6) or f_q(3) or f_q(0);
+    f_q_next(6) <= (f_q(7) and i_left and i_right);
+    f_q_next(5) <= (f_q(7) and i_right and not i_left);
+    f_q_next(4) <= f_q(5);
+    f_q_next(3) <= f_q(4);
+    f_q_next(2) <= (f_q(7) and i_left and not i_right);
+    f_q_next(1) <= f_q(2);
+    f_q_next(0) <= f_q(1);
+
+    
+
     ---------------------------------------------------------------------------------
+	-- Output logic
+	o_lights_L(2) <= f_q(6) or f_q(0);
+    o_lights_L(1) <= f_q(6) or f_q(1) or f_q(0);
+    o_lights_L(0) <= f_q(6) or f_q(2) or f_q(1) or f_q(0);
+    o_lights_R(2) <= f_q(6) or f_q(5) or f_q(4) or f_q(3);
+    o_lights_R(1) <= f_q(6) or f_q(4) or f_q(3);
+    o_lights_R(0) <= f_q(6) or f_q(3);
 	
 	-- PROCESSES --------------------------------------------------------------------
-    
+    register_proc : process (i_clk, i_reset)
+        begin
+             if i_reset = '1' then
+               f_q <= "10000000";  --Reset state to off     
+             elsif (rising_edge(i_clk)) then
+               f_q <= f_q_next;  -- next state becomes current state
+             end if;
+        end process register_proc;
 	-----------------------------------------------------					   
 				  
 end thunderbird_fsm_arch;
